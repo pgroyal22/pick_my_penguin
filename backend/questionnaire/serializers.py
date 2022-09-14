@@ -1,11 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Option, Question, Response, Selection
-
-
-class QuestionSerializer(ModelSerializer):
-    class Meta:
-        model = Question
-        fields = "__all__"
+from questionnaire.models import Questionnaire, Question, Option
 
 
 class OptionSerializer(ModelSerializer):
@@ -14,13 +8,17 @@ class OptionSerializer(ModelSerializer):
         fields = "__all__"
 
 
-class ResponseSerializer(ModelSerializer):
+class QuestionSerializer(ModelSerializer):
+    options = OptionSerializer(many=True, read_only=True)
+
     class Meta:
-        model = Response
-        fields = "__all__"
+        model = Question
+        fields = ["question_order", "question_text", "options"]
 
 
-class SelectionSerializer(ModelSerializer):
+class QuestionnaireSerializer(ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+
     class Meta:
-        model = Selection
-        field = "__all__"
+        model = Questionnaire
+        fields = ["questions"]

@@ -1,16 +1,11 @@
 from rest_framework import generics, mixins
-from questionnaire.models import Question, Option, Response, Selection
-from questionnaire.serializers import (
-    QuestionSerializer,
-    OptionSerializer,
-    ResponseSerializer,
-    SelectionSerializer,
-)
+from questionnaire.models import Question, Questionnaire
+from questionnaire.serializers import QuestionnaireSerializer
 
 
-class QuestionList(mixins.ListModelMixin, generics.GenericAPIView):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
+class QuestionnaireList(mixins.ListModelMixin, generics.GenericAPIView):
+    queryset = Questionnaire.objects.all()
+    serializer_class = QuestionnaireSerializer
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
