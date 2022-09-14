@@ -37,16 +37,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # # Third-Party Apps # #
     # API calls to frontend
     "rest_framework",
     # configuring cross-origin resource sharing
     "corsheaders",
-
+    # nested admininstration of models
+    "nested_admin",
     # # Project Apps # #
     "questionnaire",
-    "user"
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -57,7 +57,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware"
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -91,7 +91,7 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'user.PenguinUser'
+AUTH_USER_MODEL = "user.PenguinUser"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -135,6 +135,4 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # whitelisting using cors-headers and the CORS middleware
-CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
-]
+CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
