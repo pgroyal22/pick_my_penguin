@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import Questionniare from './components/Questionnaire'
+import QuestionniareComponent from './components/Questionnaire'
 
 function App() {
 
   return (
     <div className="App">
-      <Questionniare />
+      <QuestionniareComponent questionnaire_number={0} />
     </div>
   );
 }
