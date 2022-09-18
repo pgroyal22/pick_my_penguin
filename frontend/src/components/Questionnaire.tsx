@@ -1,4 +1,4 @@
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import axios from "axios";
 import { Url } from "url";
 import Card from "react-bootstrap/Card";
@@ -32,6 +32,7 @@ interface QuestionnaireState {
 
 interface QuestionProps {
   question: Question;
+  handleQuestionSubmit: (e: SyntheticEvent) => void;
 }
 interface QuestionState {}
 
@@ -51,24 +52,26 @@ class OptionComponent extends React.Component<OptionProps, OptionState> {
 }
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
+  constructor(props: QuestionProps) {
+    super(props);
+  }
   render(): JSX.Element {
     // pushing option JSX elements to an array instead of individually placing them in returned JSX
     const OptionComponentJSXs = [] as JSX.Element[];
     for (let i = 0; i < this.props.question.options.length; i++) {
       OptionComponentJSXs.push(
         <div>
-          <OptionComponent option={this.props.question.options[i]} />
+          <OptionComponent key={i} option={this.props.question.options[i]} />
         </div>
       );
     }
     return (
-      <div>
-        <h3>
-          {this.props.question.question_order + 1}.{" "}
-          {this.props.question.question_text}
-        </h3>
+      <form onSubmit={this.props.handleQuestionSubmit}>
+        {this.props.question.question_order + 1}.{" "}
+        {this.props.question.question_text}
         <div>{OptionComponentJSXs}</div>
-      </div>
+        <button type="submit">Next Question</button>
+      </form>
     );
   }
 }
@@ -100,10 +103,14 @@ class QuestionnaireComponent extends React.Component<
       },
       progress: 1,
     };
+
+    this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
   }
 
-  handleSubmitClick() {
-    this.setState({ progress: this.state.progress + 1 });
+  handleQuestionSubmit(e: React.SyntheticEvent) {
+    e.preventDefault();
+    const new_progress = this.state.progress + 1;
+    this.setState({ progress: new_progress });
   }
 
   handlePaginationClick(i: number) {
@@ -129,9 +136,10 @@ class QuestionnaireComponent extends React.Component<
     const PaginationJSXs = [] as JSX.Element[];
     for (let i = 0; i < this.state.questionnaire.questions.length; i++) {
       QuestionComponentJSXs.push(
-        <li key={i}>
-          <QuestionComponent question={this.state.questionnaire.questions[i]} />
-        </li>
+        <QuestionComponent
+          handleQuestionSubmit={this.handleQuestionSubmit}
+          question={this.state.questionnaire.questions[i]}
+        />
       );
       PaginationJSXs.push(
         <Pagination.Item
@@ -139,7 +147,7 @@ class QuestionnaireComponent extends React.Component<
           active={i + 1 === this.state.progress}
           onClick={() => this.handlePaginationClick(i + 1)}
         >
-          {i + 1}{" "}
+          {i + 1}
         </Pagination.Item>
       );
     }
