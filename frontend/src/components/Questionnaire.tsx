@@ -28,35 +28,23 @@ interface QuestionnaireProps {
 interface QuestionnaireState {
   questionnaire: Questionnaire;
   progress: number;
+  selections: number[];
 }
 
 interface QuestionProps {
   question: Question;
   handleQuestionSubmit: (e: React.SyntheticEvent) => void;
+  handleSelection: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  selected_option: number;
 }
-interface QuestionState {
-  selected_option: number | null;
-}
+interface QuestionState {}
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
-  constructor(props: QuestionProps) {
-    super(props);
-    this.state = {
-      selected_option: null,
-    };
-    this.onChangeRadio = this.onChangeRadio.bind(this);
-  }
-
-  onChangeRadio = (event: React.FormEvent<HTMLInputElement>): void => {
-    this.setState({
-      selected_option: Number(event.currentTarget.value),
-    });
-  };
-
   render(): JSX.Element {
     const JSXoptions = [] as JSX.Element[];
     const question = this.props.question;
     const options = question.options;
+
     for (let i = 0; i < options.length; i++) {
       var option = options[i];
       JSXoptions.push(
@@ -65,8 +53,8 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
             <input
               type="radio"
               value={option.option_order}
-              checked={this.state.selected_option === i}
-              onChange={this.onChangeRadio}
+              checked={this.props.selected_option === i}
+              onChange={this.props.handleSelection}
             />
             {this.props.question.options[i].option_text}
           </label>
@@ -109,9 +97,17 @@ class QuestionnaireComponent extends React.Component<
         ],
       },
       progress: 1,
+      selections: [1],
     };
 
     this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
+    this.handleSelection = this.handleSelection.bind(this);
+  }
+
+  handleSelection(event: React.ChangeEvent<HTMLInputElement>) {
+    const selections = this.state.selections.slice();
+    selections[this.state.progress - 1] = Number(event.currentTarget.value);
+    this.setState({ selections: selections });
   }
 
   handleQuestionSubmit(e: React.SyntheticEvent) {
@@ -134,8 +130,10 @@ class QuestionnaireComponent extends React.Component<
   }
 
   componentDidMount(): void {
-    console.log(this.props.questionnaire_number);
     this.getAndSetQuestions(this.props.questionnaire_number);
+    this.setState({
+      selections: [],
+    });
   }
 
   render(): JSX.Element {
@@ -146,7 +144,9 @@ class QuestionnaireComponent extends React.Component<
         <QuestionComponent
           key={i}
           handleQuestionSubmit={this.handleQuestionSubmit}
+          handleSelection={this.handleSelection}
           question={this.state.questionnaire.questions[i]}
+          selected_option={this.state.selections[i]}
         />
       );
       JSXPatiginations.push(
