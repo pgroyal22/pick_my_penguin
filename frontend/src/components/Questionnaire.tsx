@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from "react";
+import React from "react";
 import axios from "axios";
 import { Url } from "url";
 import Card from "react-bootstrap/Card";
@@ -32,21 +32,41 @@ interface QuestionnaireState {
 
 interface QuestionProps {
   question: Question;
-  handleQuestionSubmit: (e: SyntheticEvent) => void;
+  handleQuestionSubmit: (e: React.SyntheticEvent) => void;
 }
-interface QuestionState {}
+interface QuestionState {
+  selected_option: number | null;
+}
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
+  constructor(props: QuestionProps) {
+    super(props);
+    this.state = {
+      selected_option: null,
+    };
+    this.onChangeRadio = this.onChangeRadio.bind(this);
+  }
+
+  onChangeRadio = (event: React.FormEvent<HTMLInputElement>): void => {
+    this.setState({
+      selected_option: Number(event.currentTarget.value),
+    });
+  };
+
   render(): JSX.Element {
     const JSXoptions = [] as JSX.Element[];
-    for (let i = 0; i < this.props.question.options.length; i++) {
+    const question = this.props.question;
+    const options = question.options;
+    for (let i = 0; i < options.length; i++) {
+      var option = options[i];
       JSXoptions.push(
-        <div>
+        <div key={option.option_order} className="radio">
           <label>
             <input
-              name={this.props.question.question_order as {} as string}
               type="radio"
-              value={this.props.question.options[i].option_text}
+              value={option.option_order}
+              checked={this.state.selected_option === i}
+              onChange={this.onChangeRadio}
             />
             {this.props.question.options[i].option_text}
           </label>
@@ -55,8 +75,7 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
     }
     return (
       <form onSubmit={this.props.handleQuestionSubmit}>
-        {this.props.question.question_order + 1}.{" "}
-        {this.props.question.question_text}
+        {question.question_order + 1}. {question.question_text}
         {JSXoptions}
         <button type="submit">Next Question</button>
       </form>
@@ -125,6 +144,7 @@ class QuestionnaireComponent extends React.Component<
     for (let i = 0; i < this.state.questionnaire.questions.length; i++) {
       JSXQuestionComponents.push(
         <QuestionComponent
+          key={i}
           handleQuestionSubmit={this.handleQuestionSubmit}
           question={this.state.questionnaire.questions[i]}
         />
@@ -141,10 +161,14 @@ class QuestionnaireComponent extends React.Component<
     }
 
     return (
-      <Card>
+      <div className="Questionniare">
         <Pagination>{JSXPatiginations}</Pagination>
-        <Card.Body>{JSXQuestionComponents[this.state.progress - 1]}</Card.Body>
-      </Card>
+        <Card>
+          <Card.Body>
+            {JSXQuestionComponents[this.state.progress - 1]}
+          </Card.Body>
+        </Card>
+      </div>
     );
   }
 }
