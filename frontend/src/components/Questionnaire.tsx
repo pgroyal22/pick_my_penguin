@@ -1,14 +1,15 @@
 import React from "react";
-import axios from "axios";
-import { Url } from "url";
+import axios, { AxiosResponse } from "axios";
+import URL from "url";
 import Card from "react-bootstrap/Card";
 import Pagination from "react-bootstrap/Pagination";
+import "../questionnaire.css";
 
 /* Questionnaire interfaces */
 interface Option {
   option_order: number;
   option_text: string;
-  image_url?: Url;
+  image_resource?: URL;
 }
 
 interface Question {
@@ -48,24 +49,31 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
     for (let i = 0; i < options.length; i++) {
       var option = options[i];
       JSXoptions.push(
-        <div key={option.option_order} className="radio">
-          <label>
-            <input
-              type="radio"
-              value={option.option_order}
-              checked={this.props.selected_option === i}
-              onChange={this.props.handleSelection}
-            />
+        <div key={option.option_order} className="form-check form-check-inline">
+          <label className="form-check-label">
             {this.props.question.options[i].option_text}
           </label>
+          <input
+            className="form-check-input"
+            type="radio"
+            value={option.option_order}
+            checked={this.props.selected_option === i}
+            onChange={this.props.handleSelection}
+          />
+          <br />
+          <img src={String(option.image_resource)} />
         </div>
       );
     }
     return (
       <form onSubmit={this.props.handleQuestionSubmit}>
         {question.question_order + 1}. {question.question_text}
+        <br />
         {JSXoptions}
-        <button type="submit">Next Question</button>
+        <br />
+        <button type="submit" className="btn btn-secondary">
+          Next Question
+        </button>
       </form>
     );
   }
@@ -79,31 +87,17 @@ class QuestionnaireComponent extends React.Component<
     super(props);
     this.state = {
       questionnaire: {
-        questions: [
-          {
-            question_order: 0,
-            question_text: "What types of penguins do you prefer?",
-            options: [
-              {
-                option_order: 0,
-                option_text: "A Gentoo",
-              },
-              {
-                option_order: 1,
-                option_text: "An Arch",
-              },
-            ],
-          },
-        ],
+        questions: [],
       },
       progress: 1,
-      selections: [1],
+      selections: [],
     };
 
     this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
     this.handleSelection = this.handleSelection.bind(this);
   }
 
+  // handlers
   handleSelection(event: React.ChangeEvent<HTMLInputElement>) {
     const selections = this.state.selections.slice();
     selections[this.state.progress - 1] = Number(event.currentTarget.value);
@@ -120,6 +114,7 @@ class QuestionnaireComponent extends React.Component<
     this.setState({ progress: i });
   }
 
+  // static methods
   getAndSetQuestions(questionnaire_number: number) {
     axios
       .get<Questionnaire[]>("http://localhost:8000/questionnaire/")
@@ -129,11 +124,20 @@ class QuestionnaireComponent extends React.Component<
       .catch((err) => console.log(err));
   }
 
+  getImageResources(questionnaire_number: number) {
+    axios
+      .get<Questionnaire[]>("http://localhost:8000/questionnaire/")
+      .then(function (response: AxiosResponse) {
+        let questionnaire: Questionnaire = response.data[0];
+        console.log(questionnaire.questions[0].options[0].image_resource);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  // lifecycle methods
   componentDidMount(): void {
     this.getAndSetQuestions(this.props.questionnaire_number);
-    this.setState({
-      selections: [],
-    });
+    this.getImageResources(0);
   }
 
   render(): JSX.Element {
@@ -149,6 +153,7 @@ class QuestionnaireComponent extends React.Component<
           selected_option={this.state.selections[i]}
         />
       );
+
       JSXPatiginations.push(
         <Pagination.Item
           key={i}
