@@ -13,3 +13,8 @@ img {
 img[src="null"] {
   display: none;
 }
+
+.card {
+  background-color: #3d3846;
+  color: white;
+}
