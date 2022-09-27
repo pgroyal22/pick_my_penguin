@@ -1,5 +1,5 @@
 import React from "react";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import URL from "url";
 import Card from "react-bootstrap/Card";
 import Pagination from "react-bootstrap/Pagination";
@@ -61,7 +61,10 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
             onChange={this.props.handleSelection}
           />
           <br />
-          <img src={String(option.image_resource)} />
+          <img
+            src={String(option.image_resource)}
+            alt="{question.option_text}"
+          />
         </div>
       );
     }
@@ -124,20 +127,9 @@ class QuestionnaireComponent extends React.Component<
       .catch((err) => console.log(err));
   }
 
-  getImageResources(questionnaire_number: number) {
-    axios
-      .get<Questionnaire[]>("http://localhost:8000/questionnaire/")
-      .then(function (response: AxiosResponse) {
-        let questionnaire: Questionnaire = response.data[0];
-        console.log(questionnaire.questions[0].options[0].image_resource);
-      })
-      .catch((err) => console.log(err));
-  }
-
   // lifecycle methods
   componentDidMount(): void {
     this.getAndSetQuestions(this.props.questionnaire_number);
-    this.getImageResources(0);
   }
 
   render(): JSX.Element {
@@ -166,9 +158,9 @@ class QuestionnaireComponent extends React.Component<
     }
 
     return (
-      <div className="Questionniare">
+      <div className="questionnaire">
         <Pagination>{JSXPatiginations}</Pagination>
-        <Card>
+        <Card className="card">
           <Card.Body>
             {JSXQuestionComponents[this.state.progress - 1]}
           </Card.Body>
