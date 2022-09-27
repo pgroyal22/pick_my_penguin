@@ -1,12 +1,10 @@
 import React from "react";
-import QuestionniareComponent from "./components/Questionnaire";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import QuestionnaireComponent from "./components/Questionnaire";
 
 function App() {
   return (
     <div className="App">
-      <QuestionniareComponent questionnaire_number={0} />
+      <QuestionnaireComponent questionnaire_number={0} />
     </div>
   );
 }
